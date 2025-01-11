@@ -4,6 +4,8 @@ import PropTypes from "prop-types";
 import Swal from "sweetalert2";
 import * as bootstrap from "bootstrap";
 
+import Login from "./components/Login";
+
 const { VITE_API_BASE, VITE_API_PATH } = import.meta.env;
 
 const Loading = ({ isLoading }) => {
@@ -62,15 +64,6 @@ function App() {
     myModal.current.hide();
   };
 
-  // 帳號密碼更新狀態
-  const [formData, setFormData] = useState({
-    username: "",
-    password: "",
-  });
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((state) => ({ ...state, [name]: value }));
-  };
   // 新增產品資料 input 更新狀態
   const handleProductInputChange = (e) => {
     const { id, value, type, checked } = e.target;
@@ -116,6 +109,11 @@ function App() {
     });
   };
 
+  // 帳號密碼更新狀態
+  const [formData, setFormData] = useState({
+    username: "",
+    password: "",
+  });
   // 登入功能與登入驗證
   const [isAuth, setIsAuth] = useState(false);
   // 登入
@@ -175,7 +173,6 @@ function App() {
       );
       const { products } = result.data;
       setProducts(products);
-      console.log(products);
     } catch (error) {
       Swal.fire({
         icon: "error",
@@ -379,50 +376,7 @@ function App() {
           </table>
         </div>
       ) : (
-        <div className="container login">
-          <div className="row justify-content-center">
-            <h1 className="h3 mb-3 font-weight-normal">請先登入</h1>
-            <div className="col-8">
-              <form id="form" className="form-signin">
-                <div className="form-floating mb-3">
-                  <input
-                    type="email"
-                    name="username"
-                    className="form-control"
-                    id="username"
-                    placeholder="name@example.com"
-                    value={formData.username}
-                    onChange={handleInputChange}
-                    required
-                    autoFocus
-                  />
-                  <label htmlFor="username">Email address</label>
-                </div>
-                <div className="form-floating">
-                  <input
-                    type="password"
-                    name="password"
-                    className="form-control"
-                    id="password"
-                    placeholder="Password"
-                    value={formData.password}
-                    onChange={handleInputChange}
-                    required
-                  />
-                  <label htmlFor="password">Password</label>
-                </div>
-                <button
-                  className="btn btn-lg btn-primary w-100 mt-3"
-                  type="button"
-                  onClick={loginFn}
-                >
-                  登入
-                </button>
-              </form>
-            </div>
-          </div>
-          <p className="mt-5 mb-3 text-muted">&copy; 2024~∞ - 六角學院</p>
-        </div>
+        <Login loginFn={loginFn} formData={formData} setFormData={setFormData} />
       )}
       <div
         id="productModal"
@@ -479,7 +433,11 @@ function App() {
                         </div>
                       ))}
                     </div>
-                    <img className="img-fluid" src="" alt="" />
+                    <img
+                      className="img-fluid"
+                      src={temProduct.imageUrl}
+                      alt={temProduct.title}
+                    />
                   </div>
                   <div>
                     {temProduct.imagesUrl.length < 5 &&
