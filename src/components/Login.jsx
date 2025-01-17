@@ -1,6 +1,45 @@
 import PropTypes from "prop-types";
+import axios from "axios";
+import Swal from "sweetalert2";
+const { VITE_API_BASE } = import.meta.env;
 
-export default function Login({ loginFn, formData, setFormData }) {
+export default function Login({
+  setIsLoading,
+  formData,
+  setFormData,
+  getProductsData,
+  setIsAuth,
+}) {
+  // 登入
+  const loginFn = async () => {
+    try {
+      setIsLoading(true);
+      const result = await axios.post(
+        `${VITE_API_BASE}/admin/signin`,
+        formData
+      );
+      const { token, expired } = result.data;
+      document.cookie = `hexToken=${token}; expires=${new Date(
+        expired
+      )}; path=/`;
+      axios.defaults.headers.common.Authorization = token;
+      setIsAuth(true);
+      Swal.fire({
+        title: "登入成功",
+        icon: "success",
+      });
+      getProductsData();
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "登入失敗",
+        text: error,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((state) => ({ ...state, [name]: value }));
@@ -55,10 +94,12 @@ export default function Login({ loginFn, formData, setFormData }) {
 }
 
 Login.propTypes = {
-  loginFn: PropTypes.func.isRequired,
+  setIsLoading: PropTypes.func.isRequired,
   formData: PropTypes.shape({
     username: PropTypes.string.isRequired,
     password: PropTypes.string.isRequired,
   }).isRequired,
   setFormData: PropTypes.func.isRequired,
+  getProductsData: PropTypes.func.isRequired,
+  setIsAuth: PropTypes.func.isRequired,
 };
